@@ -1,0 +1,23 @@
+name: 更新主页统计
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '27 1 * * *'
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 stats.py
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/stats.svg
+          if ! git diff --cached --quiet; then
+            git commit -m "更新主页统计"
+            git push
+          fi
